@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qasai Finder — Pakistan</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f7f3ee;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: #1a472a;
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-logo .icon { font-size: 28px; }
+  .header-logo h1 { font-size: 20px; font-weight: 700; letter-spacing: 0.3px; }
+  .header-logo p { font-size: 12px; opacity: 0.75; margin-top: 1px; }
+  .admin-link {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    border: 1px solid rgba(255,255,255,0.25);
+    transition: background 0.2s;
+  }
+  .admin-link:hover { background: rgba(255,255,255,0.25); }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #1a472a 0%, #2d6a3f 60%, #4a8c5c 100%);
+    color: white;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+  }
+  .hero h2 { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+  .hero p { font-size: 15px; opacity: 0.85; margin-bottom: 1.5rem; }
+  .hero-arabic {
+    font-size: 22px;
+    font-family: 'Noto Nastaliq Urdu', serif;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    background: rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 0.9rem 2rem;
+    margin: 0 auto;
+    max-width: 500px;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 26px; font-weight: 800; }
+  .stat-label { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+  /* FILTERS */
+  .filters {
+    background: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid #e8e0d5;
+    position: sticky;
+    top: 58px;
+    z-index: 90;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .filters select, .filters input {
+    padding: 8px 12px;
+    border: 1.5px solid #d4c9ba;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #faf8f5;
+    color: #1a1a1a;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .filters select:focus, .filters input:focus { border-color: #1a472a; }
+  .filters input { flex: 1; min-width: 180px; }
+
+  .filter-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1.5px solid #d4c9ba;
+    background: #faf8f5;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #555;
+    font-weight: 500;
+  }
+  .filter-btn.active { background: #1a472a; color: white; border-color: #1a472a; }
+  .filter-btn:hover:not(.active) { border-color: #1a472a; color: #1a472a; }
+
+  /* GRID */
+  .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+  .section-title {
+    font-size: 13px;
+    color: #888;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 2rem;
+  }
+
+  /* CARD */
+  .qasai-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1.5px solid #e8e0d5;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .qasai-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+  .card-header {
+    padding: 1rem 1.2rem 0.8rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .card-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: #e8f5e9;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    border: 2px solid #c8e6c9;
+  }
+  .card-info { flex: 1; }
+  .card-name { font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 3px; }
+  .card-shop { font-size: 13px; color: #666; margin-bottom: 4px; }
+
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .status-available { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+  .status-booked { background: #fce4ec; color: #c62828; border: 1px solid #f48fb1; }
+  .status-partial { background: #fff8e1; color: #f57f17; border: 1px solid #ffe082; }
+
+  .card-details {
+    padding: 0 1.2rem 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .detail-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #555;
+  }
+  .detail-row .icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .slots-info {
+    margin: 0.5rem 1.2rem;
+    padding: 0.6rem 0.8rem;
+    background: #f7f3ee;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .slots-label { font-size: 12px; color: #888; }
+  .slots-count { font-size: 14px; font-weight: 700; color: #1a472a; }
+
+  .card-actions {
+    padding: 0.8rem 1.2rem 1rem;
+    display: flex;
+    gap: 8px;
+  }
+  .btn-call {
+    flex: 1;
+    padding: 9px;
+    border-radius: 9px;
+    border: 1.5px solid #1a472a;
+    background: white;
+    color: #1a472a;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .btn-call:hover { background: #1a472a; color: white; }
+  .btn-whatsapp {
+    flex: 1;
+    padding: 9px;
+    border-radius: 9px;
+    border: none;
+    background: #25D366;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .btn-whatsapp:hover { background: #1ebe57; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #999;
+  }
+  .empty-state .big-icon { font-size: 60px; margin-bottom: 1rem; }
+  .empty-state h3 { font-size: 18px; color: #666; margin-bottom: 8px; }
+
+  /* LOADING */
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    color: #888;
+    font-size: 15px;
+  }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #e0d8cc;
+    border-top-color: #1a472a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* REGISTER BANNER */
+  .register-banner {
+    background: linear-gradient(135deg, #1a472a, #2d6a3f);
+    color: white;
+    border-radius: 14px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .register-banner h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .register-banner p { font-size: 13px; opacity: 0.85; margin-bottom: 1rem; }
+  .btn-register {
+    display: inline-block;
+    background: white;
+    color: #1a472a;
+    padding: 10px 24px;
+    border-radius: 9px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-register:hover { background: #f0f7f0; transform: translateY(-1px); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: #aaa;
+    font-size: 12px;
+    border-top: 1px solid #e8e0d5;
+    margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <span class="icon">🐄</span>
+    <div>
+      <h1>Qasai Finder</h1>
+      <p>Pakistan</p>
+    </div>
+  </div>
+  <a href="admin.html" class="admin-link">⚙️ Admin</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-arabic">قصائی فائنڈر</div>
+  <h2>Apne Sheher ka Qasai Dhundho</h2>
+  <p>Lahore • Islamabad • Attock — Available & Booked slots dekhein</p>
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num" id="total-count">0</div>
+      <div class="stat-label">Total Qasai</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="available-count" style="color:#86efac">0</div>
+      <div class="stat-label">Available</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="booked-count" style="color:#fca5a5">0</div>
+      <div class="stat-label">Booked</div>
+    </div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <input type="text" id="search-input" placeholder="🔍 Naam ya dukan dhundho..." oninput="applyFilters()">
+  <select id="city-filter" onchange="applyFilters()">
+    <option value="">🏙️ Sab Cities</option>
+    <option value="Lahore">Lahore</option>
+    <option value="Islamabad">Islamabad</option>
+    <option value="Attock">Attock</option>
+  </select>
+  <button class="filter-btn active" onclick="setStatusFilter('all', this)">Sab</button>
+  <button class="filter-btn" onclick="setStatusFilter('available', this)">✅ Available</button>
+  <button class="filter-btn" onclick="setStatusFilter('partial', this)">🟡 Partial</button>
+  <button class="filter-btn" onclick="setStatusFilter('booked', this)">🔴 Booked</button>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- REGISTER BANNER -->
+  <div class="register-banner">
+    <h3>🐄 Kya aap Qasai hain?</h3>
+    <p>Apni dukaan register karein aur zyada customers tak pahunchein — bilkul free!</p>
+    <a href="https://forms.gle/39UbK4GCfDyNzjqe6" target="_blank" class="btn-register">📝 Abhi Register Karein</a>
+  </div>
+
+  <div class="section-title" id="results-label">Sab Qasai</div>
+  <div id="loading" class="loading">
+    <div class="spinner"></div>
+    Data load ho raha hai...
+  </div>
+  <div class="cards-grid" id="cards-grid"></div>
+  <div id="empty-state" class="empty-state" style="display:none">
+    <div class="big-icon">🔍</div>
+    <h3>Koi nahi mila</h3>
+    <p>Doosra city ya naam try karein</p>
+  </div>
+</div>
+
+<footer>
+  Qasai Finder &copy; 2025 — Pakistan<br>
+  <small>Koi masla? Admin se rabta karein</small>
+</footer>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // 🔴 YAHAN APNI FIREBASE CONFIG DAALEIN
+  const firebaseConfig = {
+    apiKey: "AIzaSyCoLEY94fFq3nqiwYlneOlzZIWIgxpDBe8",
+    authDomain: "qassai-finder.firebaseapp.com",
+    projectId: "qassai-finder",
+    storageBucket: "qassai-finder.firebasestorage.app",
+    messagingSenderId: "290927922784",
+    appId: "1:290927922784:web:2a4ae7b0667c7a8df6bd05",
+    measurementId: "G-N1Y3QYSCMV"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let allQasai = [];
+  let currentStatusFilter = 'all';
+
+  const q = query(collection(db, "qasai"), orderBy("name"));
+  onSnapshot(q, (snapshot) => {
+    allQasai = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    updateStats();
+    applyFilters();
+    document.getElementById('loading').style.display = 'none';
+  }, (error) => {
+    document.getElementById('loading').innerHTML = '⚠️ Data load nahi hua. Firebase config check karein.';
+  });
+
+  function updateStats() {
+    document.getElementById('total-count').textContent = allQasai.length;
+    document.getElementById('available-count').textContent = allQasai.filter(q => q.status === 'available').length;
+    document.getElementById('booked-count').textContent = allQasai.filter(q => q.status === 'booked').length;
+  }
+
+  window.setStatusFilter = function(status, btn) {
+    currentStatusFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  };
+
+  window.applyFilters = function() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const city = document.getElementById('city-filter').value;
+
+    let filtered = allQasai.filter(q => {
+      const matchSearch = !search ||
+        q.name?.toLowerCase().includes(search) ||
+        q.shopName?.toLowerCase().includes(search) ||
+        q.area?.toLowerCase().includes(search);
+      const matchCity = !city || q.city === city;
+      const matchStatus = currentStatusFilter === 'all' || q.status === currentStatusFilter;
+      return matchSearch && matchCity && matchStatus;
+    });
+
+    renderCards(filtered);
+
+    const label = document.getElementById('results-label');
+    label.textContent = `${filtered.length} Qasai mile${city ? ' — ' + city : ''}`;
+  };
+
+  function renderCards(list) {
+    const grid = document.getElementById('cards-grid');
+    const empty = document.getElementById('empty-state');
+
+    if (list.length === 0) {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    grid.innerHTML = list.map(q => {
+      const statusClass = q.status === 'available' ? 'status-available' :
+                          q.status === 'booked' ? 'status-booked' : 'status-partial';
+      const statusText = q.status === 'available' ? '✅ Available' :
+                         q.status === 'booked' ? '🔴 Booked' : '🟡 Partial';
+      const waMsg = encodeURIComponent(`Assalam o Alaikum! Maine Qasai Finder par aapko dekha. Eid ul Adha ke liye availability check karni thi.`);
+      const phone = q.phone?.replace(/\D/g, '');
+
+      return `
+        <div class="qasai-card">
+          <div class="card-header">
+            <div class="card-avatar">🐄</div>
+            <div class="card-info">
+              <div class="card-name">${q.name || 'Naam nahi'}</div>
+              <div class="card-shop">🏪 ${q.shopName || 'Dukaan'}</div>
+            </div>
+            <span class="status-badge ${statusClass}">${statusText}</span>
+          </div>
+          <div class="card-details">
+            <div class="detail-row"><span class="icon">📍</span>${q.area || ''}, ${q.city || ''}</div>
+            ${q.experience ? `<div class="detail-row"><span class="icon">⭐</span>${q.experience} saal ka tajurba</div>` : ''}
+            ${q.animals ? `<div class="detail-row"><span class="icon">🐄</span>${q.animals}</div>` : ''}
+          </div>
+          <div class="slots-info">
+            <span class="slots-label">Slots</span>
+            <span class="slots-count">
+              ${q.bookedSlots || 0} booked / ${q.totalSlots || '?'} total
+            </span>
+          </div>
+          <div class="card-actions">
+            <a href="tel:${q.phone}" class="btn-call">📞 Call</a>
+            <a href="https://wa.me/92${phone?.slice(-10)}?text=${waMsg}" target="_blank" class="btn-whatsapp">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+</script>
+
+</body>
+</html>

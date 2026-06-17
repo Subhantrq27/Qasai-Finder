@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Qasai Finder</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f0; color: #1a1a1a; min-height: 100vh; }
+
+  /* LOGIN */
+  .login-screen {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1a472a 0%, #2d6a3f 100%);
+  }
+  .login-box {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    width: 340px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .login-box .icon { font-size: 48px; margin-bottom: 1rem; }
+  .login-box h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; color: #1a472a; }
+  .login-box p { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+  .login-box input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 9px;
+    font-size: 15px;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .login-box input:focus { border-color: #1a472a; }
+  .btn-login {
+    width: 100%;
+    padding: 12px;
+    background: #1a472a;
+    color: white;
+    border: none;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-login:hover { background: #2d6a3f; }
+  .login-error { color: #c62828; font-size: 13px; margin-top: 8px; display: none; }
+
+  /* MAIN APP */
+  .app { display: none; }
+
+  /* HEADER */
+  .header {
+    background: #1a472a;
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header h1 { font-size: 18px; font-weight: 700; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-logout {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 6px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .btn-public {
+    background: white;
+    color: #1a472a;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* STATS */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 1.2rem 1.5rem;
+    background: white;
+    border-bottom: 1px solid #e0e8e0;
+  }
+  .stat-card {
+    text-align: center;
+    padding: 0.8rem;
+    border-radius: 10px;
+    background: #f7faf7;
+    border: 1px solid #e0e8e0;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 800; color: #1a472a; }
+  .stat-card .lbl { font-size: 12px; color: #888; margin-top: 2px; }
+
+  /* CONTAINER */
+  .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+  /* ADD FORM */
+  .add-form-card {
+    background: white;
+    border-radius: 14px;
+    border: 1.5px solid #e0e8e0;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .form-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a472a;
+    margin-bottom: 1rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1.5px solid #e0e8e0;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 12px; color: #666; font-weight: 600; }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 9px 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: #1a472a; }
+  .btn-add {
+    background: #1a472a;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-add:hover { background: #2d6a3f; }
+  .btn-add:disabled { background: #aaa; cursor: not-allowed; }
+
+  /* TABLE */
+  .table-card {
+    background: white;
+    border-radius: 14px;
+    border: 1.5px solid #e0e8e0;
+    overflow: hidden;
+  }
+  .table-header {
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e0e8e0;
+  }
+  .table-header h3 { font-size: 15px; font-weight: 700; color: #1a472a; }
+  .table-search {
+    padding: 7px 12px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    width: 200px;
+  }
+  .table-search:focus { border-color: #1a472a; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: #f7faf7;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-bottom: 1px solid #e0e8e0;
+  }
+  td {
+    padding: 12px 14px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f4f0;
+    vertical-align: middle;
+  }
+  tr:hover td { background: #f9fbf9; }
+  tr:last-child td { border-bottom: none; }
+
+  .badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .badge-available { background: #e8f5e9; color: #2e7d32; }
+  .badge-booked { background: #fce4ec; color: #c62828; }
+  .badge-partial { background: #fff8e1; color: #f57f17; }
+
+  .status-select {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+    cursor: pointer;
+    background: white;
+  }
+
+  .btn-delete {
+    background: #fce4ec;
+    color: #c62828;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .btn-delete:hover { background: #f8bbd0; }
+
+  .loading { text-align: center; padding: 3rem; color: #888; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #1a472a;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s;
+    z-index: 1000;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.error { background: #c62828; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="icon">🔐</div>
+    <h2>Admin Login</h2>
+    <p>Qasai Finder — Admin Panel</p>
+    <input type="password" id="pwd-input" placeholder="Password dalein..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">Login Karein</button>
+    <div class="login-error" id="login-error">❌ Galat password!</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="main-app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <h1>🐄 Qasai Finder — Admin Panel</h1>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn-public">🌐 Public Site</a>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="num" id="s-total">0</div>
+      <div class="lbl">Total Qasai</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="s-available" style="color:#2e7d32">0</div>
+      <div class="lbl">Available</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="s-partial" style="color:#f57f17">0</div>
+      <div class="lbl">Partial</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="s-booked" style="color:#c62828">0</div>
+      <div class="lbl">Booked</div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- ADD FORM -->
+    <div class="add-form-card">
+      <div class="form-title">➕ Naya Qasai Add Karein</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Qasai ka Naam *</label>
+          <input type="text" id="f-name" placeholder="Muhammad Ali">
+        </div>
+        <div class="form-group">
+          <label>Dukaan ka Naam</label>
+          <input type="text" id="f-shop" placeholder="Ali Qasai Shop">
+        </div>
+        <div class="form-group">
+          <label>Phone Number *</label>
+          <input type="text" id="f-phone" placeholder="03001234567">
+        </div>
+        <div class="form-group">
+          <label>City *</label>
+          <select id="f-city">
+            <option value="">City chunein</option>
+            <option value="Lahore">Lahore</option>
+            <option value="Islamabad">Islamabad</option>
+            <option value="Attock">Attock</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Area / Mohalla</label>
+          <input type="text" id="f-area" placeholder="Gulberg, F-10, etc.">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="f-status">
+            <option value="available">✅ Available</option>
+            <option value="partial">🟡 Partial</option>
+            <option value="booked">🔴 Booked</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Total Slots</label>
+          <input type="number" id="f-total-slots" placeholder="10" min="1">
+        </div>
+        <div class="form-group">
+          <label>Booked Slots</label>
+          <input type="number" id="f-booked-slots" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>Tajurba (saal)</label>
+          <input type="number" id="f-exp" placeholder="5" min="0">
+        </div>
+        <div class="form-group">
+          <label>Janwar ka type</label>
+          <input type="text" id="f-animals" placeholder="Bakra, Gaay, Oont">
+        </div>
+      </div>
+      <button class="btn-add" id="add-btn" onclick="addQasai()">✅ Add Karein</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>📋 Registered Qasai</h3>
+        <input type="text" class="table-search" placeholder="🔍 Search..." oninput="filterTable(this.value)">
+      </div>
+      <div id="table-loading" class="loading">Data load ho raha hai...</div>
+      <div id="table-wrapper" style="overflow-x:auto; display:none">
+        <table>
+          <thead>
+            <tr>
+              <th>Naam</th>
+              <th>Dukaan</th>
+              <th>City</th>
+              <th>Area</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Slots</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // 🔴 YAHAN APNI FIREBASE CONFIG DAALEIN (same as index.html)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCoLEY94fFq3nqiwYlneOlzZIWIgxpDBe8",
+    authDomain: "qassai-finder.firebaseapp.com",
+    projectId: "qassai-finder",
+    storageBucket: "qassai-finder.firebasestorage.app",
+    messagingSenderId: "290927922784",
+    appId: "1:290927922784:web:2a4ae7b0667c7a8df6bd05",
+    measurementId: "G-N1Y3QYSCMV"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // SIMPLE PASSWORD (change this!)
+  const ADMIN_PASSWORD = "qasai2025";
+
+  let allData = [];
+
+  window.doLogin = function() {
+    const pwd = document.getElementById('pwd-input').value;
+    if (pwd === ADMIN_PASSWORD) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('main-app').style.display = 'block';
+      loadData();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  };
+
+  window.doLogout = function() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('pwd-input').value = '';
+  };
+
+  function loadData() {
+    const q = query(collection(db, "qasai"), orderBy("name"));
+    onSnapshot(q, (snap) => {
+      allData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      updateStats();
+      renderTable(allData);
+      document.getElementById('table-loading').style.display = 'none';
+      document.getElementById('table-wrapper').style.display = 'block';
+    });
+  }
+
+  function updateStats() {
+    document.getElementById('s-total').textContent = allData.length;
+    document.getElementById('s-available').textContent = allData.filter(d => d.status === 'available').length;
+    document.getElementById('s-partial').textContent = allData.filter(d => d.status === 'partial').length;
+    document.getElementById('s-booked').textContent = allData.filter(d => d.status === 'booked').length;
+  }
+
+  window.addQasai = async function() {
+    const name = document.getElementById('f-name').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const city = document.getElementById('f-city').value;
+
+    if (!name || !phone || !city) {
+      showToast('❌ Naam, phone aur city zaroori hai!', true);
+      return;
+    }
+
+    const btn = document.getElementById('add-btn');
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+
+    try {
+      await addDoc(collection(db, "qasai"), {
+        name,
+        shopName: document.getElementById('f-shop').value.trim(),
+        phone,
+        city,
+        area: document.getElementById('f-area').value.trim(),
+        status: document.getElementById('f-status').value,
+        totalSlots: parseInt(document.getElementById('f-total-slots').value) || 0,
+        bookedSlots: parseInt(document.getElementById('f-booked-slots').value) || 0,
+        experience: parseInt(document.getElementById('f-exp').value) || 0,
+        animals: document.getElementById('f-animals').value.trim(),
+        createdAt: serverTimestamp()
+      });
+      clearForm();
+      showToast('✅ Qasai add ho gaya!');
+    } catch(e) {
+      showToast('❌ Error: ' + e.message, true);
+    }
+
+    btn.disabled = false;
+    btn.textContent = '✅ Add Karein';
+  };
+
+  function clearForm() {
+    ['f-name','f-shop','f-phone','f-area','f-total-slots','f-booked-slots','f-exp','f-animals'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('f-city').value = '';
+    document.getElementById('f-status').value = 'available';
+  }
+
+  window.updateStatus = async function(id, status) {
+    try {
+      await updateDoc(doc(db, "qasai", id), { status });
+      showToast('✅ Status update ho gaya!');
+    } catch(e) {
+      showToast('❌ Error!', true);
+    }
+  };
+
+  window.deleteQasai = async function(id, name) {
+    if (!confirm(`"${name}" ko delete karna chahte hain?`)) return;
+    try {
+      await deleteDoc(doc(db, "qasai", id));
+      showToast('🗑️ Delete ho gaya!');
+    } catch(e) {
+      showToast('❌ Error!', true);
+    }
+  };
+
+  window.filterTable = function(search) {
+    const s = search.toLowerCase();
+    const filtered = allData.filter(d =>
+      d.name?.toLowerCase().includes(s) ||
+      d.shopName?.toLowerCase().includes(s) ||
+      d.city?.toLowerCase().includes(s) ||
+      d.area?.toLowerCase().includes(s)
+    );
+    renderTable(filtered);
+  };
+
+  function renderTable(data) {
+    const tbody = document.getElementById('table-body');
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:#aaa">Koi data nahi mila</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map(d => {
+      const badgeCls = d.status === 'available' ? 'badge-available' : d.status === 'booked' ? 'badge-booked' : 'badge-partial';
+      return `
+        <tr>
+          <td><strong>${d.name || '—'}</strong></td>
+          <td>${d.shopName || '—'}</td>
+          <td>${d.city || '—'}</td>
+          <td>${d.area || '—'}</td>
+          <td><a href="tel:${d.phone}" style="color:#1a472a;font-weight:600">${d.phone || '—'}</a></td>
+          <td>
+            <select class="status-select" onchange="updateStatus('${d.id}', this.value)">
+              <option value="available" ${d.status==='available'?'selected':''}>✅ Available</option>
+              <option value="partial" ${d.status==='partial'?'selected':''}>🟡 Partial</option>
+              <option value="booked" ${d.status==='booked'?'selected':''}>🔴 Booked</option>
+            </select>
+          </td>
+          <td>${d.bookedSlots || 0} / ${d.totalSlots || '?'}</td>
+          <td><button class="btn-delete" onclick="deleteQasai('${d.id}', '${d.name}')">🗑️ Delete</button></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+</script>
+</body>
+</html>
